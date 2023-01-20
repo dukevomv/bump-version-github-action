@@ -12,21 +12,18 @@ jobs:
       - name: Set the value
         id: step_one
         run: |
-          echo "action_state=yellow" >> $GITHUB_ENV
+          echo "current_version=$(grep -m1 version composer.json | awk -F: '{ print $2 }' | sed 's/[", ]//g')" >> $GITHUB_ENV
       - name: Use the value
         id: step_two
         run: |
-          echo "${{ env.action_state }}" # This will output 'yellow'
+          echo "${{ env.current_version }}"
       - name: Get the current version
         run: |
-          # Extract the current version from composer.json
-          echo ::set-env name=CURRENT_VERSION::$(grep -m1 version composer.json | awk -F: '{ print $2 }' | sed 's/[", ]//g')
-          echo $CURRENT_VERSION
-          
-          # Increment the patch version number
-          NEW_VERSION=$(echo $CURRENT_VERSION | awk -F. -v OFS=. 'NF==1{print ++$NF}; NF>1{if(length($NF+1)>length($NF))$(NF-1)++; $NF=sprintf("%0*d", length($NF), ($NF+1)%(10^length($NF))); print}')
-          echo $NEW_VERSION
-          
+          echo "new_version=$(echo env.current_version | awk -F. -v OFS=. 'NF==1{print ++$NF}; NF>1{if(length($NF+1)>length($NF))$(NF-1)++; $NF=sprintf("%0*d", length($NF), ($NF+1)%(10^length($NF))); print}')" >> $GITHUB_ENV
+      - name: Use the value
+        id: step_two2
+        run: |
+          echo "${{ env.new_version }}"
       - name: Update composer.json
         run: |
           # Replace the version number in composer.json
