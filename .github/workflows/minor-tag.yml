@@ -33,6 +33,7 @@ jobs:
           git add composer.json
           # Commit the changes with a message
           git commit -m "Update composer.json to version ${{ env.new_version }}"
+          git push
       - name: Create the tag
         run: |
           # Create the tag
