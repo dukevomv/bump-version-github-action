@@ -3,7 +3,7 @@ name: Create minor tag
 on:
   push:
     branches:
-      - master
+      - main
 
 jobs:
   create-tag:
