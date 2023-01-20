@@ -11,10 +11,11 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Set variable
-        run: echo ::set-env name=VAR_NAME::value
+        run: echo "SELECTED_COLOR=green" >> $GITHUB_OUTPUT
+
 
       - name: Echo variable
-        run: echo $VAR_NAME
+        run: echo ${{ steps.random-color-generator.outputs.SELECTED_COLOR }}"
         
       - name: Get the current version
         run: |
