@@ -18,7 +18,7 @@ jobs:
           echo "new_version=$(echo ${{env.current_version}} | awk -F. -v OFS=. 'NF==1{print ++$NF}; NF>1{if(length($NF+1)>length($NF))$(NF-1)++; $NF=sprintf("%0*d", length($NF), ($NF+1)%(10^length($NF))); print}')" >> $GITHUB_ENV
       - name: Show new value
         run: |
-          echo "Bumping version from ${{ env.current_version }}" to ${{ env.new_version }}"
+          echo "Bumping version from ${{ env.current_version }} to ${{ env.new_version }}"
       - name: Update composer.json with new version
         run: |
           # Replace the version number in composer.json
