@@ -10,10 +10,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - name: Set variable
+        run: echo ::set-env name=VAR_NAME::value
+
+      - name: Echo variable
+        run: echo $VAR_NAME
+        
       - name: Get the current version
         run: |
           # Extract the current version from composer.json
-          CURRENT_VERSION=$(grep -m1 version composer.json | awk -F: '{ print $2 }' | sed 's/[", ]//g')
+          echo ::set-env name=CURRENT_VERSION::$(grep -m1 version composer.json | awk -F: '{ print $2 }' | sed 's/[", ]//g')
           echo $CURRENT_VERSION
           
           # Increment the patch version number
