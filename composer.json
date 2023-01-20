@@ -1,7 +1,7 @@
 {
     "name": "semver/github-action",
     "description": "Create next semver for composer.json with github actions",
-    "keywords": ["github-actions"],
+    "keywords": ["github-actions","semver"],
     "license": "MIT",
     "type": "project",
     "require": {
