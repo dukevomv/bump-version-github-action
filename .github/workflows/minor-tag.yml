@@ -9,7 +9,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - run: ls -la
       - name: Get current version from composer.json
         run: |
           echo "current_version=$(grep -m1 version composer.json | awk -F: '{ print $2 }' | sed 's/[", ]//g')" >> $GITHUB_ENV
@@ -38,6 +37,5 @@ jobs:
         run: |
           # Create the tag
           git tag ${{ env.new_version }}
-
           # Push the tag to GitHub
           git push origin ${{ env.new_version }}
