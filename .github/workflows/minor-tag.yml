@@ -10,10 +10,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Set variable
-        run: echo "SELECTED_COLOR=green" >> $GITHUB_OUTPUT
-      - name: Echo variable
-        run: echo ${{ steps.random-color-generator.outputs.SELECTED_COLOR }}"
         
       - name: Get the current version
         run: |
@@ -30,6 +26,10 @@ jobs:
           # Replace the version number in composer.json
           sed -i "s/$CURRENT_VERSION/$NEW_VERSION/g" composer.json
 
+      - name: Set variable
+        run: echo "SELECTED_COLOR=green" >> $GITHUB_OUTPUT
+      - name: Echo variable
+        run: echo ${{ steps.minor-tag.outputs.SELECTED_COLOR }}"
       - name: Commit the changes
         run: |
           # Add the modified composer.json file to the staging area
