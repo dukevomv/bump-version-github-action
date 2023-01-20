@@ -17,20 +17,7 @@ jobs:
 
           # Increment the patch version number
           NEW_VERSION=$(echo $CURRENT_VERSION | awk -F. -v OFS=. 'NF==1{print ++$NF}; NF>1{if(length($NF+1)>length($NF))$(NF-1)++; $NF=sprintf("%0*d", length($NF), ($NF+1)%(10^length($NF))); print}')
-      - name: List files
-        run: ls -la      
-      - name: PWD
-        run: $(pwd)      
-      - name: list of parent
-        run: ls -la ..    
-      - name: list of parent parent
-        run: ls -la ../..    
-      - name: Echo File Path
-        run: echo $(pwd)/composer.json
-      - name: Install dependencies
-        run: composer install
-      - name: Run PHPUnit tests
-        run: vendor/bin/phpunit
+          
       - name: Update composer.json
         run: |
           # Replace the version number in composer.json
