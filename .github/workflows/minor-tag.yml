@@ -10,44 +10,29 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - run: ls -la
-      - name: Set the value
-        id: step_one
+      - name: Get current version from composer.json
         run: |
           echo "current_version=$(grep -m1 version composer.json | awk -F: '{ print $2 }' | sed 's/[", ]//g')" >> $GITHUB_ENV
-          echo "curw=$(date +%F)" >> $GITHUB_ENV
-      - name: Use the value
-        id: step_two
-        run: |
-          echo "${{ env.current_version }}"
-          echo "${{ env.curw }}"
-      - name: Get the current version
+      - name: Bump a new minor version
         run: |
           echo "new_version=$(echo ${{env.current_version}} | awk -F. -v OFS=. 'NF==1{print ++$NF}; NF>1{if(length($NF+1)>length($NF))$(NF-1)++; $NF=sprintf("%0*d", length($NF), ($NF+1)%(10^length($NF))); print}')" >> $GITHUB_ENV
-      - name: Use the value
-        id: step_two2
+      - name: Show new value
         run: |
-          echo "${{ env.new_version }}"
-      - name: Update composer.json
+          echo "Bumping version from ${{ env.current_version }}" to ${{ env.new_version }}"
+      - name: Update composer.json with new version
         run: |
           # Replace the version number in composer.json
-          sed -i "s/$CURRENT_VERSION/$NEW_VERSION/g" composer.json
-
-      - name: Set variable
-        run: echo "SELECTED_COLOR=green" >> $GITHUB_OUTPUT
-      - name: Echo variable
-        run: echo ${{ steps.minor-tag.outputs.SELECTED_COLOR }}"
+          sed -i "s/${{ env.current_version }}/${{ env.new_version }}/g" composer.json
       - name: Commit the changes
         run: |
           # Add the modified composer.json file to the staging area
           git add composer.json
-
           # Commit the changes with a message
-          git commit -m "Update composer.json to version $NEW_VERSION"
-
+          git commit -m "Update composer.json to version ${{ env.new_version }}"
       - name: Create the tag
         run: |
           # Create the tag
-          git tag $NEW_VERSION
+          git tag ${{ env.new_version }}
 
           # Push the tag to GitHub
-          git push origin $NEW_VERSION
+          git push origin ${{ env.new_version }}
