@@ -4,6 +4,7 @@
     "keywords": ["github-actions","semver"],
     "license": "MIT",
     "type": "project",
+    "version": "1.31.5",
     "require": {
         "php": ">=7.1.3"
     },
