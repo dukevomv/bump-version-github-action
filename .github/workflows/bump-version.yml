@@ -36,11 +36,11 @@ jobs:
       - name: Bump Minor Version
         if: ${{ env.feature_flag == '1' }}
         run: |
-          echo "new_version=$(echo ${{ env.current_version }} | awk -F. -v OFS=. 'NF==1{print ++$NF}; NF>1{$(NF-1)++; $NF="0"; print}') >> $GITHUB_ENV"
+          echo "new_version=$(echo ${{ env.current_version }} | awk -F. -v OFS=. '{$NF++; printf("%s.%s.%s", $1, $2, ++$3, $NF)}'" >> $GITHUB_ENV
       - name: Bump Bugfix version
         if: ${{ env.feature_flag == '0' }}
         run: |
-          echo "new_version=$(echo ${{env.current_version}} | awk -F. -v OFS=. '{$NF++; print}')" >> $GITHUB_ENV
+          echo "new_version=$(echo ${{env.current_version}}   | awk -F. -v OFS=. '{$NF++; printf("%s.%s.%s", $1, ++$2, 0, $NF)}'" >> $GITHUB_ENV
       - name: Show new Version
         run: |
           echo "Bumping version from ${{ env.current_version }} to ${{ env.new_version }}"
