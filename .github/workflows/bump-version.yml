@@ -7,6 +7,8 @@ on:
       - closed
 env: 
   versioned_file: composer.json
+  git_email: actions@github.com
+  git_name: Github Actions
 jobs:
   if_merged:
     if: github.event.pull_request.merged == true
@@ -39,8 +41,8 @@ jobs:
           sed -i "s/${{ env.current_version }}/${{ env.new_version }}/g" ${{ env.versioned_file }}
       - name: Set Global git config
         run: |
-          git config --global user.email "actions@github.com"
-          git config --global user.name "Github Actions"
+          git config --global user.email ${{ env.git_email }}
+          git config --global user.name ${{ env.git_name }}
       - name: Commit the changes
         run: |
           git add ${{ env.versioned_file }}
