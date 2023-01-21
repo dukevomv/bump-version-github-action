@@ -25,7 +25,7 @@ jobs:
       - name: Get current version from ${{ env.versioned_file }}
         run: |
           echo "current_version=$(grep -m1 version ${{ env.versioned_file }} | awk -F: '{ print $2 }' | sed 's/[", ]//g')" >> $GITHUB_ENV
-      - name: Fail if version is invalid
+      - name: Fail if current version is invalid
         run: |
           if [[ ${{env.current_version}} =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
               echo "valid semver version"
@@ -36,14 +36,24 @@ jobs:
       - name: Bump Minor Version
         if: ${{ env.feature_flag == '1' }}
         run: |
-          echo "new_version=$(echo ${{env.current_version}}   | awk -F. -v OFS=. '{$NF++; printf(\"%s.%s.%s\", $1, $2, ++$3, $NF)}')" >> $GITHUB_ENV
+          new_version=$(echo ${{env.current_version}}   | awk -F. -v OFS=. '{$NF++; printf(\"%s.%s.%s\", $1, $2, ++$3, $NF)}')
+          echo "$new_version" >> $GITHUB_ENV
       - name: Bump Bugfix version
         if: ${{ env.feature_flag == '0' }}
         run: |
-          echo "new_version=$(echo ${{env.current_version}}   | awk -F. -v OFS=. '{$NF++; printf(\"%s.%s.%s\", $1, ++$2, 0, $NF)}')" >> $GITHUB_ENV
+          new_version=$(echo ${{env.current_version}}   | awk -F. -v OFS=. '{$NF++; printf(\"%s.%s.%s\", $1, ++$2, 0, $NF)}')
+          echo "$new_version" >> $GITHUB_ENV
       - name: Show new Version
         run: |
           echo "Bumping version from ${{ env.current_version }} to ${{ env.new_version }}"
+      - name: Fail if new version is invalid
+        run: |
+          if [[ ${{env.new_version}} =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+              echo "valid semver version"
+          else
+            echo "::error Invalid semver version: ${{env.new_version}}"
+            exit 1
+          fi
       - name: Update ${{ env.versioned_file }} with the new version
         run: |
           sed -i "s/${{ env.current_version }}/${{ env.new_version }}/g" ${{ env.versioned_file }}
