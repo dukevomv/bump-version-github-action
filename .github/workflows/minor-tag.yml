@@ -1,17 +1,22 @@
 name: Create minor tag
-
 on:
-  push:
+  pull_request:
     branches:
       - main
+    types:
+      - closed
 jobs:
-  create-tag:
+  if_merged:
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - name: Get current version from composer.json
         run: |
           echo "current_version=$(grep -m1 version composer.json | awk -F: '{ print $2 }' | sed 's/[", ]//g')" >> $GITHUB_ENV
+      - name: Echo source branch
+        run: |
+          echo "${{ github.head_ref }}"
       - name: Bump a new minor version
         run: |
           echo "new_version=$(echo ${{env.current_version}} | awk -F. -v OFS=. 'NF==1{print ++$NF}; NF>1{if(length($NF+1)>length($NF))$(NF-1)++; $NF=sprintf("%0*d", length($NF), ($NF+1)%(10^length($NF))); print}')" >> $GITHUB_ENV
