@@ -6,7 +6,7 @@ on:
     types:
       - closed
 env: 
-  versioned_file: composer.json
+  versioned_files: composer.json,package.json
   git_email: actions@github.com
   git_name: Github Actions
 jobs:
@@ -22,9 +22,13 @@ jobs:
           else
             echo "feature_flag=0" >> $GITHUB_ENV
           fi
-      - name: Get current version from ${{ env.versioned_file }}
+      - name: Get current version from ${{ env.versioned_files }}
         run: |
-          echo "current_version=$(grep -m1 version ${{ env.versioned_file }} | awk -F: '{ print $2 }' | sed 's/[", ]//g')" >> $GITHUB_ENV
+          IFS=', ' read -r -a options <<< "${{ env.versioned_file }}"
+          for option in "${options[@]}"; do
+            echo "Processing option: $option"
+            echo "current_version=$(grep -m1 version $option | awk -F: '{ print $2 }' | sed 's/[", ]//g')" >> $GITHUB_ENV
+          done
       - name: Fail if current version is invalid
         run: |
           if [[ ${{env.current_version}} =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
@@ -33,6 +37,14 @@ jobs:
             echo "::error Invalid semver version: ${{env.current_version}}"
             exit 1
           fi
+      
+      - name: Loop over options
+        id: loop-options
+        run: |
+          for option in ${{ env.OPTIONS }}; do
+          echo "Processing option: ${option}"
+          # add more steps here
+          done
       - name: Bump Minor Version
         if: ${{ env.feature_flag == '1' }}
         run: |
