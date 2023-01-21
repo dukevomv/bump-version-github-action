@@ -27,10 +27,10 @@ jobs:
           echo "current_version=$(grep -m1 version ${{ env.versioned_file }} | awk -F: '{ print $2 }' | sed 's/[", ]//g')" >> $GITHUB_ENV
       - name: Fail if version is invalid
         run: |
-          if [[ $version =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+          if [[ ${{env.current_version}} =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
               echo "valid semver version"
           else
-            echo "::error Invalid semver version: $version"
+            echo "::error Invalid semver version: ${{env.current_version}}"
             exit 1
           fi
       - name: Bump Minor Version
