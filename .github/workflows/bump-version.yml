@@ -28,7 +28,9 @@ jobs:
       - name: Fail if current version is invalid
         run: |
           if [[ ${{env.current_version}} =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-              echo "valid semver version"
+            echo "valid semver version"
+            echo "::error Invalid semver version: ${{env.current_version}}"
+            exit 1
           else
             echo "::error Invalid semver version: ${{env.current_version}}"
             exit 1
@@ -47,7 +49,7 @@ jobs:
       - name: Fail if new version is invalid
         run: |
           if [[ ${{env.new_version}} =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-              echo "valid semver version"
+            echo "valid semver version"
           else
             echo "::error Invalid semver version: ${{env.new_version}}"
             exit 1
