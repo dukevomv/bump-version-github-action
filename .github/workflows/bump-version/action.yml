@@ -1,0 +1,14 @@
+name: Bump Version on Merge
+  workflow_dispatch:
+env: 
+  versioned_file: composer.json
+  git_email: actions@github.com
+  git_name: Github Actions
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'The exact tag to be added'
+        required: true 
+        type: string
