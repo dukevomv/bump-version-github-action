@@ -12,3 +12,60 @@ on:
         description: 'The exact tag to be added'
         required: true 
         type: string
+
+runs-on: ubuntu-latest
+steps:
+- uses: actions/checkout@v3
+- name: Check if Feature Branch merged
+  run: |
+    if [[ "${{ github.event.pull_request.head.ref }}" == feature* ]]; then
+      echo "feature_flag=1" >> $GITHUB_ENV
+    else
+      echo "feature_flag=0" >> $GITHUB_ENV
+    fi
+- name: Get current version from ${{ env.versioned_file }}
+  run: |
+    echo "current_version=$(grep -m1 version ${{ env.versioned_file }} | awk -F: '{ print $2 }' | sed 's/[", ]//g')" >> $GITHUB_ENV
+- name: Fail if current version is invalid
+  run: |
+    if [[ ${{env.current_version}} =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+      echo "valid semver version"
+    else
+      echo "::error Invalid semver version: ${{env.current_version}}"
+      exit 1
+    fi
+- name: Bump Minor Version
+  if: ${{ env.feature_flag == '1' }}
+  run: |
+    echo "new_version=$(echo ${{env.current_version}} | awk -F. -v OFS=. '{printf("%s.%s.%s", $1, ++$2, 0, $NF)}')" >> $GITHUB_ENV
+- name: Bump Bugfix version
+  if: ${{ env.feature_flag == '0' }}
+  run: |
+    echo "new_version=$(echo ${{env.current_version}} | awk -F. -v OFS=. '{printf("%s.%s.%s", $1, $2, ++$3, $NF)}')" >> $GITHUB_ENV
+- name: Show new Version
+  run: |
+    echo "Bumping version from ${{ env.current_version }} to ${{ env.new_version }}"
+- name: Fail if new version is invalid
+  run: |
+    if [[ ${{env.new_version}} =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+      echo "valid semver version"
+    else
+      echo "::error Invalid semver version: ${{env.new_version}}"
+      exit 1
+    fi
+- name: Update ${{ env.versioned_file }} with the new version
+  run: |
+    sed -i "s/${{ env.current_version }}/${{ env.new_version }}/g" ${{ env.versioned_file }}
+- name: Set Global git config
+  run: |
+    git config --global user.email ${{ env.git_email }}
+    git config --global user.name ${{ env.git_name }}
+- name: Commit the changes
+  run: |
+    git add ${{ env.versioned_file }}
+    git commit -m "Update ${{ env.versioned_file }} to version ${{ env.new_version }}"
+    git push
+- name: Create the tag
+  run: |
+    git tag ${{ env.new_version }}
+    git push origin ${{ env.new_version }}
