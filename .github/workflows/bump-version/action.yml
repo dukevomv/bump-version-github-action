@@ -1,4 +1,4 @@
-name: Bump Version on Merge
+name: Bump Version
   workflow_dispatch:
 env: 
   versioned_file: composer.json
